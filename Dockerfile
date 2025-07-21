@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tesseract-ocr-jpn \
     tesseract-ocr-chi-sim \
     poppler-utils \
+    nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Copia o arquivo de dependências do Python para dentro da "caixa"
