@@ -29,4 +29,4 @@ COPY . .
 EXPOSE 10000
 
 # O comando final para iniciar nosso servidor Gunicorn quando a "caixa" for ligada
-CMD ["gunicorn", "--bind", "0.0.0.0:10000", "--workers=4", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:10000", "--workers=2", "app:app"]
