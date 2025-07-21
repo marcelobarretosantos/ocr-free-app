@@ -32,6 +32,8 @@ def index():
     return render_template('index.html')
 
 # Substitua a função ocr_process inteira por esta nova versão
+# Em app.py, substitua a função ocr_process inteira por esta nova versão
+
 @app.route('/ocr', methods=['POST'])
 def ocr_process():
     """Processa o upload de arquivo e realiza o OCR, com detecção automática de idioma."""
@@ -57,37 +59,38 @@ def ocr_process():
         extracted_text = ""
         detected_lang_code = None
 
-        # Lógica para detecção automática
-        if lang == 'auto':
-            # 1. Faz o OCR com um conjunto de idiomas latinos para maior chance de acerto
-            # Nota: Misturar idiomas com alfabetos diferentes (ex: latim e japonês) aqui reduziria muito a precisão.
-            ocr_langs = 'por+eng+spa'
-            if filename.lower().endswith(('.pdf')):
-                images = convert_from_path(temp_filepath, poppler_path=poppler_path)
-                for i, image in enumerate(images):
-                    extracted_text += pytesseract.image_to_string(image, lang=ocr_langs) + "\n\n"
-            else:
-                image = Image.open(temp_filepath)
-                extracted_text = pytesseract.image_to_string(image, lang=ocr_langs)
+        if filename.lower().endswith(('.pdf')):
+            # =========================================================================
+            # MUDANÇA PRINCIPAL AQUI:
+            # 1. Removemos o 'poppler_path' que não existe mais.
+            # 2. Adicionamos 'last_page=1' para processar só a 1ª página e economizar memória.
+            # =========================================================================
+            images = convert_from_path(temp_filepath, last_page=1) 
             
-            # 2. Detecta o idioma do texto extraído
-            if extracted_text.strip(): # Garante que não está vazio
-                try:
-                    detected_lang_code = detect(extracted_text)
-                except LangDetectException:
-                    detected_lang_code = "incerto" # Não foi possível detectar
-        else:
-            # Comportamento antigo: usa o idioma específico fornecido
-            if filename.lower().endswith(('.pdf')):
-                images = convert_from_path(temp_filepath, poppler_path=poppler_path)
-                for i, image in enumerate(images):
-                    extracted_text += f"--- Página {i+1} ---\n"
+            for i, image in enumerate(images):
+                # Se quisermos, podemos remover o aviso de "Página 1" já que só processamos uma
+                # extracted_text += f"--- Página {i+1} ---\n"
+                if lang == 'auto':
+                    ocr_langs = 'por+eng+spa'
+                    extracted_text += pytesseract.image_to_string(image, lang=ocr_langs) + "\n\n"
+                else:
                     extracted_text += pytesseract.image_to_string(image, lang=lang) + "\n\n"
+        else:
+            # Processamento de imagem normal
+            image = Image.open(temp_filepath)
+            if lang == 'auto':
+                ocr_langs = 'por+eng+spa'
+                extracted_text = pytesseract.image_to_string(image, lang=ocr_langs)
             else:
-                image = Image.open(temp_filepath)
-                extracted_text = pytesseract.image_to_string(image, lang=lang)
+                 extracted_text = pytesseract.image_to_string(image, lang=lang)
 
-        # Retorna o texto e, se aplicável, o idioma detectado
+        # Lógica de detecção de idioma (movida para fora para abranger ambos os casos)
+        if lang == 'auto' and extracted_text.strip():
+            try:
+                detected_lang_code = detect(extracted_text)
+            except LangDetectException:
+                detected_lang_code = "incerto"
+
         return jsonify({'text': extracted_text, 'detected_lang': detected_lang_code})
 
     except Exception as e:
