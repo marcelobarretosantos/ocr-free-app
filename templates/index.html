@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-T">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR Inteligente</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" class="logo">
+        <h1>TETI OCR-FREE</h1>
+    </header>
+
+    <div class="container">
+        <div class="input-column">
+            <h2>Extrair Texto de Imagem ou PDF</h2>
+            <p>Cole uma imagem (Ctrl+V), arraste ou selecione um arquivo.</p>
+            
+            <div class="language-selector">
+                <label for="lang-select">Idioma do Documento:</label>
+                <select id="lang-select">
+                    <option value="auto" selected>Automático</option>
+                    <option value="por">Português</option>
+                    <option value="eng">Inglês</option>
+                    <option value="spa">Espanhol</option>
+                    <option value="jpn">Japonês</option>
+                    <option value="chi_sim">Mandarim (Simplificado)</option>
+                </select>
+                <span id="detected-lang-info"></span>
+            </div>
+
+            <div id="drop-area">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Arraste e solte o arquivo aqui</p>
+                <span>OU</span>
+                <div class="upload-buttons">
+                    <input type="file" id="fileElem" accept="image/*,.pdf">
+                    <label class="button" for="fileElem">Selecionar Arquivo</label>
+                    <button id="camera-btn" class="button camera-button">
+                        <i class="fas fa-camera"></i> Usar Câmera
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-column">
+            <div id="loading" class="hidden">
+                <div class="spinner"></div>
+                <p>Processando, por favor aguarde...</p>
+            </div>
+            <div class="result-container">
+                <div class="result-header">
+                    <h2>Texto Extraído:</h2>
+                    <div id="translation-controls" class="hidden">
+                        <select id="translate-to-lang">
+                            <option value="pt">Português</option>
+                            <option value="en">Inglês</option>
+                            <option value="es">Espanhol</option>
+                            <option value="ja">Japonês</option>
+                            <option value="zh-cn">Mandarim (Simplificado)</option>
+                        </select>
+                        <button id="translate-btn">
+                            <i class="fas fa-language"></i> Traduzir
+                        </button>
+                    </div>
+                    <div>
+                        <button id="clear-btn" class="hidden"><i class="fas fa-trash"></i> Limpar</button>
+                        <button id="copy-btn" class="hidden"><i class="fas fa-copy"></i> Copiar</button>
+                        <button id="download-word-btn" class="hidden"><i class="fas fa-file-word"></i> Word</button>
+                    </div>
+                </div>
+                <pre id="result-text"></pre>
+            </div>
+        </div>
+    </div>
+
+    <div id="camera-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <video id="camera-view" autoplay playsinline></video>
+            <button id="capture-btn" class="button capture-button">
+                <i class="fas fa-camera"></i> Tirar Foto
+            </button>
+            <button id="close-modal-btn" class="close-button">&times;</button>
+        </div>
+    </div>
+
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
